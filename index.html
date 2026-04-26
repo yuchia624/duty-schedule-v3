@@ -1753,10 +1753,20 @@ document.getElementById('addCustomDutyBtn').addEventListener('click', () => {
 document.getElementById('zoomIn').addEventListener('click', () => { pxPerMinute = Math.min(4, pxPerMinute + 0.2); renderTimeHeader(); renderRows(); });
 document.getElementById('zoomOut').addEventListener('click', () => { pxPerMinute = Math.max(0.6, pxPerMinute - 0.2); renderTimeHeader(); renderRows(); });
 document.addEventListener('keydown', e => {
+  const tag = document.activeElement.tagName.toLowerCase();
+  const isTyping = tag === 'input' || tag === 'textarea' || tag === 'select';
+
+  if (isTyping) return;
+
   if ((e.key === 'Delete' || e.key === 'Backspace') && selectedBlockId !== null) {
+    e.preventDefault();
+
     schedule = schedule.filter(x => x.uid !== selectedBlockId);
     selectedBlockId = null;
-    renderPalette(); renderRows(); saveLocal();
+
+    renderPalette();
+    renderRows();
+    saveLocal();
   }
 });
 
