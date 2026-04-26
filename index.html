@@ -507,6 +507,121 @@
     top: 54px !important;
   }
 
+
+  /* UI 優化：移除大段說明，讓畫面更乾淨 */
+  .panel-title {
+    padding: 12px 14px 6px;
+    font-size: 18px;
+    letter-spacing: .2px;
+  }
+  .controls {
+    padding: 0 14px 8px;
+    grid-template-columns: 1fr 1fr;
+  }
+  .controls input,
+  .controls select,
+  .controls button {
+    min-height: 36px;
+  }
+  #searchInput,
+  #roleFilter,
+  #cloudStatus {
+    grid-column: 1 / -1;
+  }
+  .custom-duty-box {
+    margin: 6px 14px 8px;
+    padding: 8px;
+  }
+  .custom-duty-title {
+    margin-bottom: 6px;
+  }
+  .palette-tabs {
+    padding: 8px 10px 0;
+    gap: 6px;
+  }
+  .tab-btn {
+    padding: 7px 10px;
+    font-size: 12px;
+  }
+  .palette-view {
+    padding: 8px 10px 12px;
+    gap: 6px;
+  }
+  .group-title {
+    margin: 8px 2px 4px;
+    font-size: 12px;
+  }
+  .duty-chip {
+    min-height: 38px;
+    min-width: 96px;
+    padding: 0 12px;
+  }
+  .workspace-topbar {
+    padding: 8px 12px 0;
+  }
+  .assignment-toggle-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  .toolbar {
+    padding: 8px 12px;
+    gap: 6px;
+    min-height: 52px;
+  }
+  .toolbar .search-wrap {
+    width: 220px;
+  }
+  .toolbar button {
+    width: auto;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 13px;
+  }
+  .header {
+    top: 52px !important;
+  }
+  .name-col {
+    font-size: 15px;
+  }
+  .time-label {
+    font-size: 12px;
+  }
+  .person-cell {
+    padding: 5px 8px;
+  }
+  .pending-rest {
+    font-size: 10px;
+    padding: 1px 5px;
+  }
+  .shift-select {
+    width: 58px;
+    height: 34px;
+  }
+  .block {
+    height: calc(var(--row-height) - 12px);
+    top: 6px;
+    border-radius: 12px;
+  }
+  .block .label {
+    font-size: 15px;
+  }
+  .block-delete-btn {
+    top: -7px;
+    right: -7px;
+    width: 22px;
+    height: 22px;
+    line-height: 18px;
+    box-shadow: 0 2px 8px rgba(239,68,68,.22);
+  }
+  @media (max-width: 900px) {
+    :root { --sidebar-width: 360px; }
+    .sidebar { min-width: 360px; }
+    .custom-duty-grid { grid-template-columns: 1fr 76px 70px auto; }
+    .toolbar .search-wrap { width: 180px; }
+  }
+
 </style>
 </head>
 <body>
@@ -514,9 +629,8 @@
 <div class="app">
   <aside class="sidebar">
     <div class="panel-title">Duty 區塊庫</div>
-    <div class="panel-sub">左側只顯示短碼＋時間。右邊上方搜尋與時間軸表頭都會固定，往下滑不會消失。</div>
     <div class="controls">
-      <input id="searchInput" type="text" placeholder="搜尋航班或 duty，例如 35R、8P、接機" />
+      <input id="searchInput" type="text" placeholder="搜尋 duty / 航班" />
       <select id="roleFilter">
         <option value="">全部 duty</option>
         <option value="RC">只看 RC</option>
@@ -544,7 +658,6 @@
       </div>
     </div>
 
-    <div class="hint">左側格式例如：35R 05:05-05:50。右側搜尋航班時，會把相關人員整列拉到最上面。</div>
     <div class="palette-tabs">
       <button class="tab-btn active" data-tab="byRole">依 duty 種類</button>
       <button class="tab-btn" data-tab="byTime">依時間先後</button>
@@ -820,12 +933,11 @@
   <div class="control-panel">
 
     <div class="toolbar">
-      <div class="search-wrap"><input id="timelineFlightSearch" type="text" placeholder="右側時間軸搜尋航班，例如 BR166 或 166" /></div>
+      <div class="search-wrap"><input id="timelineFlightSearch" type="text" placeholder="搜尋航班" /></div>
       <button id="clearTimelineSearch">清除搜尋</button>
       <button id="zoomOut">時間縮小</button>
       <button id="zoomIn">時間放大</button>
       <button id="saveBtn">儲存到瀏覽器</button>
-      <span style="color:#6b7280;font-size:13px;">搜尋時，會把符合航班的人員整列移到最上面，並顯示該人全部 duty。</span>
     </div>
     <div class="board">
       <div class="header">
