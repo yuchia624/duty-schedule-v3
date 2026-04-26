@@ -150,6 +150,32 @@
   .shift-band-label { display:none; }
   .block { z-index: 2; }
 
+  .block-delete-btn {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    border: 1px solid #ef4444;
+    background: #fff;
+    color: #ef4444;
+    font-size: 15px;
+    font-weight: 900;
+    line-height: 18px;
+    cursor: pointer;
+    display: none;
+    z-index: 20;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,.16);
+  }
+  .block.selected .block-delete-btn,
+  .block:hover .block-delete-btn {
+    display: flex;
+  }
+
+
 
   body { padding-top: 0; }
   .assignment-overlay-bar {
@@ -440,6 +466,45 @@
   .palette-view {
     flex: 1 1 auto;
     min-height: 120px;
+  }
+
+  /* ===== 修正：人員欄與時間線對齊、往下滑時固定時間軸 ===== */
+  .board {
+    min-width: calc(220px + var(--timeline-width));
+  }
+  .header {
+    grid-template-columns: 220px var(--timeline-width) !important;
+    position: sticky !important;
+    top: 54px !important;
+    z-index: 500 !important;
+  }
+  .name-col {
+    width: 220px;
+    min-width: 220px;
+    z-index: 520 !important;
+  }
+  .times {
+    z-index: 510 !important;
+  }
+  .row {
+    grid-template-columns: 220px var(--timeline-width) !important;
+  }
+  .person-cell {
+    width: 220px;
+    min-width: 220px;
+    z-index: 100 !important;
+  }
+  .control-panel {
+    overflow: auto !important;
+  }
+  .control-panel .toolbar {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 600 !important;
+    min-height: 54px;
+  }
+  .control-panel .header {
+    top: 54px !important;
   }
 
 </style>
@@ -1374,13 +1439,41 @@ function createBlockEl(item, normalizedSearch) {
   const block = document.createElement('div');
   block.className = 'block';
   applyRoleClass(block, item.role);
+
   if (normalizedSearch && item.flight !== normalizedSearch) block.classList.add('dimmed');
+
   block.dataset.uid = item.uid;
   block.style.left = timeToLeft(item.start) + 'px';
   block.style.width = durationToWidth(item.start, item.end) + 'px';
-  block.innerHTML = `<div class="label">${item.role === "休" ? "休" : (item.role === "自訂" ? item.label : (item.compactLabel || compactDutyLabel(item.flight, item.role)))}</div>`;
-  block.addEventListener('click', e => { e.stopPropagation(); selectBlock(item.uid); });
-  block.addEventListener('mousedown', e => startMoveBlock(e, item));
+
+  block.innerHTML = `
+    <div class="label">${item.role === "休" ? "休" : (item.role === "自訂" ? item.label : (item.compactLabel || compactDutyLabel(item.flight, item.role)))}</div>
+    <button class="block-delete-btn" type="button" title="刪除此 duty">×</button>
+  `;
+
+  const deleteBtn = block.querySelector('.block-delete-btn');
+  deleteBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    schedule = schedule.filter(x => x.uid !== item.uid);
+    selectedBlockId = null;
+
+    renderPalette();
+    renderRows();
+    saveLocal();
+  });
+
+  block.addEventListener('click', e => {
+    e.stopPropagation();
+    selectBlock(item.uid);
+  });
+
+  block.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('block-delete-btn')) return;
+    startMoveBlock(e, item);
+  });
+
   return block;
 }
 
@@ -1753,8 +1846,9 @@ document.getElementById('addCustomDutyBtn').addEventListener('click', () => {
 document.getElementById('zoomIn').addEventListener('click', () => { pxPerMinute = Math.min(4, pxPerMinute + 0.2); renderTimeHeader(); renderRows(); });
 document.getElementById('zoomOut').addEventListener('click', () => { pxPerMinute = Math.max(0.6, pxPerMinute - 0.2); renderTimeHeader(); renderRows(); });
 document.addEventListener('keydown', e => {
-  const tag = document.activeElement.tagName.toLowerCase();
-  const isTyping = tag === 'input' || tag === 'textarea' || tag === 'select';
+  const active = document.activeElement;
+  const tag = active && active.tagName ? active.tagName.toLowerCase() : '';
+  const isTyping = tag === 'input' || tag === 'textarea' || tag === 'select' || (active && active.isContentEditable);
 
   if (isTyping) return;
 
